@@ -20,24 +20,30 @@ def tf_deriv(batch, ksize=3, padding='SAME'):
 def discriminator(image, mask, options, reuse=False, name="discriminator"):
 
     with tf.variable_scope(name):
-        # image is 256 x 512 x input_c_dim
+        # image is 480 * 640 * input_c_dim
         if reuse:
             tf.get_variable_scope().reuse_variables()
         else:
             assert tf.get_variable_scope().reuse is False
 
         h0 = lrelu(conv2d(image, options.df_dim, name='d_h0_conv'))
-        # h0 is (128 x 256 x self.df_dim)
+        #. h0 is (128 x 256 x self.df_dim)
+        # h0 is (240 x 320 x self.df_dim)
         h1 = lrelu(instance_norm(conv2d(h0, options.df_dim*2, name='d_h1_conv'), 'd_bn1'))
         # h1 is (64 x 128 x self.df_dim*2)
+        # h1 is (120 x 160 x self.df_dim*2)
         h2 = lrelu(instance_norm(conv2d(h1, options.df_dim*4, name='d_h2_conv'), 'd_bn2'))
         # h2 is (32x 64 x self.df_dim*4)
-        h3 = lrelu(instance_norm(conv2d(h2, options.df_dim*8, s=1, name='d_h3_conv'), 'd_bn3'))
-        # h3 is (32 x 64 x self.df_dim*8)
-        h4 = conv2d(h3, options.segment_class, s=1, name='d_h4_conv')
-        h4_mask = tf.reduce_sum(tf.multiply(h4, mask), axis=-1, keep_dims=True)
+        # h2 is (60 x 80 x self.df_dim*4)
+        h3 = lrelu(instance_norm(conv2d(h2, options.df_dim * 8, name='d_h3_conv'), 'd_bn3'))
+        # h3 is (30 x 40 x self.df_dim*8)
+        h4 = lrelu(instance_norm(conv2d(h2, options.df_dim * 8, s=1, name='d_h4_conv'), 'd_bn4'))
+        # h4 is (30 x 40 x self.df_dim*8)
+        h5 = conv2d(h4, options.segment_class, s=1, name='d_h5_conv')
+        h5_mask = tf.reduce_sum(tf.multiply(h5, mask), axis=-1, keep_dims=True)
         # h4_mask is (32 x 64 x 1)
-        return h4_mask
+        # h5_mask is  (30 * 40 * 1)
+        return h5_mask
 
 
 def generator_unet(image, options, reuse=False, name="generator"):
@@ -49,11 +55,11 @@ def generator_unet(image, options, reuse=False, name="generator"):
         else:
             assert tf.get_variable_scope().reuse is False
 
-        e1 = instance_norm(conv2d(image, options.gf_dim, name='g_e1_conv'))
-        e2 = instance_norm(conv2d(lrelu(e1), options.gf_dim*2, name='g_e2_conv'), 'g_bn_e2')
-        e3 = instance_norm(conv2d(lrelu(e2), options.gf_dim*4, name='g_e3_conv'), 'g_bn_e3')
-        e4 = instance_norm(conv2d(lrelu(e3), options.gf_dim*8, name='g_e4_conv'), 'g_bn_e4')
-        e5 = instance_norm(conv2d(lrelu(e4), options.gf_dim*8, name='g_e5_conv'), 'g_bn_e5')
+        e1 = instance_norm(conv2d(image, options.gf_dim, name='g_e1_conv'))                       #e1 240 * 320
+        e2 = instance_norm(conv2d(lrelu(e1), options.gf_dim*2, name='g_e2_conv'), 'g_bn_e2')      #e2 120 * 160
+        e3 = instance_norm(conv2d(lrelu(e2), options.gf_dim*4, name='g_e3_conv'), 'g_bn_e3')      #e3 60 * 80
+        e4 = instance_norm(conv2d(lrelu(e3), options.gf_dim*8, name='g_e4_conv'), 'g_bn_e4')      #e4 30 * 40
+        e5 = instance_norm(conv2d(lrelu(e4), options.gf_dim*8, name='g_e5_conv'), 'g_bn_e5')      #e5 15 * 20
         #e6 = instance_norm(conv2d(lrelu(e5), options.gf_dim*8, name='g_e6_conv'), 'g_bn_e6')
         #e7 = instance_norm(conv2d(lrelu(e6), options.gf_dim*8, name='g_e7_conv'), 'g_bn_e7')
         #e8 = instance_norm(conv2d(lrelu(e7), options.gf_dim*8, name='g_e8_conv'), 'g_bn_e8')
