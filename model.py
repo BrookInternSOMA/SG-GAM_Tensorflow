@@ -74,10 +74,10 @@ class sggan(object):
         self.conved_seg_A = tf.abs(tf.nn.depthwise_conv2d(self.seg_A, self.kernel, [1, 1, 1, 1], padding="VALID", name="conved_seg_A"))
         self.conved_seg_B = tf.abs(tf.nn.depthwise_conv2d(self.seg_B, self.kernel, [1, 1, 1, 1], padding="VALID", name="conved_seg_B"))
         # change weighted_seg from (1.0, 0.0) to (0.9, 0.1) for soft gradient-sensitive loss
-        self.weighted_seg_A = tf.abs(tf.sign(tf.reduce_sum(self.conved_seg_A, axis=-1, keep_dims=True)))
-        self.weighted_seg_B = tf.abs(tf.sign(tf.reduce_sum(self.conved_seg_B, axis=-1, keep_dims=True)))
-        #self.weighted_seg_A = 0.9 * tf.abs(tf.sign(tf.reduce_sum(self.conved_seg_A, axis=-1, keep_dims=True))) + 0.1
-        #self.weighted_seg_B = 0.9 * tf.abs(tf.sign(tf.reduce_sum(self.conved_seg_B, axis=-1, keep_dims=True))) + 0.1
+        #self.weighted_seg_A = tf.abs(tf.sign(tf.reduce_sum(self.conved_seg_A, axis=-1, keep_dims=True)))
+        #self.weighted_seg_B = tf.abs(tf.sign(tf.reduce_sum(self.conved_seg_B, axis=-1, keep_dims=True)))
+        self.weighted_seg_A = 0.9 * tf.abs(tf.sign(tf.reduce_sum(self.conved_seg_A, axis=-1, keep_dims=True))) + 0.1
+        self.weighted_seg_B = 0.9 * tf.abs(tf.sign(tf.reduce_sum(self.conved_seg_B, axis=-1, keep_dims=True))) + 0.1
 
         #self.weighted_seg_A = tf.sign(tf.reduce_sum(self.conved_seg_A, axis=-1, keep_dims=True))
         #self.weighted_seg_B = tf.sign(tf.reduce_sum(self.conved_seg_B, axis=-1, keep_dims=True))
