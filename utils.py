@@ -70,11 +70,11 @@ def load_train_data(image_path, image_width=512, image_height=256, num_seg_masks
     if not is_testing:
         img_A = scipy.misc.imresize(img_A, [image_height, image_width])
         seg_A = scipy.misc.imresize(seg_A, [image_height, image_width])
-        seg_mask_A = scipy.ndimage.interpolation.zoom(seg_mask_A, (image_height/8.0/seg_mask_A.shape[0], image_width/8.0/seg_mask_A.shape[1],1), mode="nearest")
+        seg_mask_A = scipy.ndimage.interpolation.zoom(seg_mask_A, (image_height/16.0/seg_mask_A.shape[0], image_width/16.0/seg_mask_A.shape[1],1), mode="nearest")
         
         img_B = scipy.misc.imresize(img_B, [image_height, image_width])
         seg_B = scipy.misc.imresize(seg_B, [image_height, image_width])
-        seg_mask_B = scipy.ndimage.interpolation.zoom(seg_mask_B, (image_height/8.0/seg_mask_B.shape[0], image_width/8.0/seg_mask_B.shape[1],1), mode="nearest")
+        seg_mask_B = scipy.ndimage.interpolation.zoom(seg_mask_B, (image_height/16.0/seg_mask_B.shape[0], image_width/16.0/seg_mask_B.shape[1],1), mode="nearest")
 
         if np.random.random() > 0.5:
             img_A = np.fliplr(img_A)

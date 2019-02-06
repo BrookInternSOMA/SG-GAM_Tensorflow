@@ -117,8 +117,8 @@ class sggan(object):
         self.fake_B_sample = tf.placeholder(tf.float32,
                                             [None, self.image_height, self.image_width,
                                              self.output_c_dim], name='fake_B_sample')
-        self.mask_A_sample = tf.placeholder(tf.float32, [None, self.image_height/2, self.image_width/2, self.segment_class], name='mask_A_sample')
-        self.mask_B_sample = tf.placeholder(tf.float32, [None, self.image_height/2, self.image_width/2, self.segment_class], name='mask_B_sample')
+        self.mask_A_sample = tf.placeholder(tf.float32, [None, self.image_height/16, self.image_width/16, self.segment_class], name='mask_A_sample')
+        self.mask_B_sample = tf.placeholder(tf.float32, [None, self.image_height/16, self.image_width/16, self.segment_class], name='mask_B_sample')
 
 
         self.DB_real = self.discriminator(self.real_B, self.mask_B, self.options, reuse=True, name="discriminatorB")
